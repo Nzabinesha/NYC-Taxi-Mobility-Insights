@@ -12,7 +12,7 @@ import pandas as pd
 import numpy as np
 
 # === FILE PATHS ===
-RAW_FILE = "train.csv"
+RAW_FILE = "raw/train.csv"
 CLEAN_FILE = "cleaned_train.csv"
 LOG_FILE = "excluded_records.log"
 
