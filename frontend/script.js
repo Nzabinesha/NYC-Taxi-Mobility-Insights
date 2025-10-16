@@ -1,6 +1,6 @@
 // ================= LOAD CSV =================
 async function loadData() {
-  const res = await fetch("../data/cleaned_train.csv");
+  const res = await fetch("../data/processed/cleaned_train.csv");
   const txt = await res.text();
   const rows = txt.trim().split("\n").slice(1);
 
