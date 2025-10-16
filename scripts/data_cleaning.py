@@ -170,3 +170,5 @@ print("- speed_kmph       : average speed (km/h) for anomaly detection and mobil
 print("- pickup_hour      : hour of day for temporal analysis")
 print("- pickup_dayofweek : day of week for weekday/weekend analysis")
 print("- *_z columns      : Z-score normalized coordinates (mean=0, std=1)")
+print(f"Cleaned data saved to: {CLEAN_FILE}")
+print(f"Final shape: {df_cleaned.shape}")
