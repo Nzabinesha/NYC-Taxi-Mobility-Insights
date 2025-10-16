@@ -12,7 +12,7 @@ app = Flask(__name__)
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Shakiratullah@1234',  # Update your MySQL password
+    'password': '123',  # Update your MySQL password
     'database': 'nyc_taxi_db'
 }
 

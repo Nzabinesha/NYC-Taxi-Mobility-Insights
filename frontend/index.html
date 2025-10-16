@@ -8,8 +8,9 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <!-- HEADER -->
   <header class="header">
@@ -49,29 +50,29 @@
       <p id="totalTrips">--</p>
     </div>
     <div class="card">
-      <h3>Average Distance</h3>
-      <p id="avgDistance">-- km</p>
+      <h3>Average Duration</h3>
+      <p id="avgDuration">-- sec</p>
     </div>
     <div class="card">
-      <h3>Average Speed</h3>
-      <p id="avgSpeed">-- km/h</p>
+      <h3>Most Common Passenger Count</h3>
+      <p id="commonPassenger">--</p>
     </div>
   </section>
 
   <!-- CHARTS -->
   <section class="charts">
     <div class="chart-container">
-      <h2>📆 Trips Distribution by Distance</h2>
-      <canvas id="distanceChart"></canvas>
+      <h2>📆 Trips Over Time</h2>
+      <canvas id="tripsChart"></canvas>
     </div>
 
     <div class="chart-container">
-      <h2>🚖 Trips by Vendor</h2>
-      <canvas id="vendorChart"></canvas>
+      <h2>⏰ Avg Trip Duration by Hour</h2>
+      <canvas id="durationChart"></canvas>
     </div>
   </section>
 
-  <!-- TOP 10 TRIPS TABLE -->
+  <!-- TOP TRIPS TABLE -->
   <section class="top-trips">
     <h2>🏆 Top 10 Trips</h2>
     <label>
@@ -79,27 +80,30 @@
       <select id="sortBy">
         <option value="trip_distance_km">Distance (km)</option>
         <option value="speed_kmph">Speed (km/h)</option>
-        <option value="pickup_hour">Pickup Hour</option>
+        <option value="trip_duration">Duration (sec)</option>
       </select>
     </label>
-    <table id="topTripsTable">
+    <table>
       <thead>
         <tr>
+          <th>ID</th>
           <th>Distance (km)</th>
           <th>Speed (km/h)</th>
+          <th>Duration (sec)</th>
           <th>Pickup Hour</th>
-          <th>Pickup Day</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="topTripsBody"></tbody>
     </table>
   </section>
 
   <!-- FOOTER -->
-  <footer class="footer">
-    NYC Taxi Mobility Dashboard | &copy; 2025
-  </footer>
+<!-- FOOTER -->
+<footer class="footer">
+  NYC Taxi Mobility Dashboard |  &copy; 2025
+</footer>
 
-  <script src="/static/script.js"></script>
+
+  <script src="script.js"></script>
 </body>
 </html>
