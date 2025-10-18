@@ -92,6 +92,7 @@ This project demonstrates a complete **data pipeline**, from cleaning and struct
 ---
 
 ## 🧩 Folder Structure
+```bash
 NYC-Taxi-Mobility-Insights/
 │
 ├── backend/
@@ -127,7 +128,7 @@ NYC-Taxi-Mobility-Insights/
 ├── docker-compose.yml
 ├── requirements.txt
 └── README.md
-
+```
 
 ---
 
@@ -204,3 +205,4 @@ python backend/server.py
 ```bash
 http://localhost:5000
 ```
+
