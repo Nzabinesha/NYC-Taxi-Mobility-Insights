@@ -175,29 +175,32 @@ NYC-Taxi-Mobility-Insights/
 ```bash
 git clone https://github.com/Nzabinesha/NYC-Taxi-Mobility-Insights.git
 cd NYC-Taxi-Mobility-Insights
-
----
+```
 
 ### 2️⃣ Create and Activate Virtual Environment
 ```bash
 python3 -m venv venv
 source venv/bin/activate   # (Linux/Mac)
 venv\Scripts\activate      # (Windows)
+```
 
 ### 3️⃣ Install Dependencies
 ```bash
 pip install -r requirements.txt
+```
 
 ### 4️⃣ Set Up the Database
 ```bash
 python database/setup_db.py
 python database/insert_cleaned_taxi_data.py
+```
 
 ### 5️⃣ Run the Backend
 ```bash
 python backend/server.py
+```
 
 ### 6️⃣ Open the Dashboard
 ```bash
 http://localhost:5000
-
+```
