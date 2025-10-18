@@ -176,6 +176,8 @@ NYC-Taxi-Mobility-Insights/
 git clone https://github.com/Nzabinesha/NYC-Taxi-Mobility-Insights.git
 cd NYC-Taxi-Mobility-Insights
 
+---
+
 ### 2️⃣ Create and Activate Virtual Environment
 ```bash
 python3 -m venv venv
@@ -198,3 +200,4 @@ python backend/server.py
 ### 6️⃣ Open the Dashboard
 ```bash
 http://localhost:5000
+
