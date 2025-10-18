@@ -9,13 +9,17 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Optional: hide trip ID column if you want */
+    /* table th:first-child, table td:first-child { display: none; } */
+  </style>
 </head>
 
 <body>
   <!-- HEADER -->
   <header class="header">
     <h1>🚕 NYC Taxi Dashboard</h1>
-    <p>Explore NYC taxi trip patterns</p>
+    <p>Explore NYC taxi trip patterns in NYC</p>
   </header>
 
   <!-- FILTERS -->
@@ -31,11 +35,11 @@
     </label>
 
     <label>
-      Peak Hour:
+      Peak Hours:
       <select id="peakHours">
         <option value="">All</option>
-        <option value="8-10">8–10 AM</option>
-        <option value="17-19">5–7 PM</option>
+        <option value="morning">Morning Rush (Weekdays 8–11 AM)</option>
+        <option value="evening">Evening Rush (Weekdays 5–8 PM)</option>
       </select>
     </label>
 
@@ -86,11 +90,12 @@
     <table>
       <thead>
         <tr>
-          <th>ID</th>
+          <th>Trip ID</th>
           <th>Distance (km)</th>
           <th>Speed (km/h)</th>
           <th>Duration (sec)</th>
           <th>Pickup Hour</th>
+          <th>Pickup Day</th>
         </tr>
       </thead>
       <tbody id="topTripsBody"></tbody>
@@ -100,7 +105,7 @@
   <!-- FOOTER -->
   <footer class="footer">
      NYC Taxi Mobility Dashboard | &copy; 2025
-      </footer>
+  </footer>
 
   <script src="script.js"></script>
 </body>

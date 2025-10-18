@@ -1,153 +1,174 @@
-// ================= LOAD CSV =================
-async function loadData() {
-  const res = await fetch("../data/processed/cleaned_train.csv");
-  const txt = await res.text();
-  const rows = txt.trim().split("\n").slice(1);
+const API_BASE = "http://192.168.18.12:5000"; // Flask server
 
-  return rows.map(r => {
-    const c = r.split(",");
-    return {
-      id: c[0],
-      vendor: c[1],
-      pickup: new Date(c[2]),
-      dropoff: new Date(c[3]),
-      pas: Number(c[4]),
-      pickup_lon: Number(c[5]),
-      pickup_lat: Number(c[6]),
-      dropoff_lon: Number(c[7]),
-      dropoff_lat: Number(c[8]),
-      store_flag: c[9],
-      trip_duration: Number(c[10]),
-      trip_distance_km: Number(c[11]),
-      speed_kmph: Number(c[12]),
-      pickup_hour: Number(c[13])
-    };
+let allTripsData = [];
+let tripsData = [];
+
+// --------------------
+// Fetch trips data
+// --------------------
+async function fetchTrips() {
+  try {
+    const res = await fetch(`${API_BASE}/trips`);
+    allTripsData = await res.json();
+    // Convert numeric fields to numbers for safety
+    allTripsData.forEach(t => {
+      t.trip_distance_km = Number(t.trip_distance_km) || 0;
+      t.speed_kmph = Number(t.speed_kmph) || 0;
+      t.trip_duration = Number(t.trip_duration) || 0;
+      t.pickup_hour = Number(t.pickup_hour) || 0;
+      t.pickup_dayofweek = Number(t.pickup_dayofweek) || 0;
+      t.passenger_count = Number(t.passenger_count) || 0;
+    });
+    tripsData = [...allTripsData]; // copy for filtering
+    updateDashboard();
+  } catch (err) {
+    console.error("Error fetching trips:", err);
+  }
+}
+
+// --------------------
+// Update Summary Cards
+// --------------------
+function updateSummary() {
+  const totalTrips = tripsData.length;
+  const avgDuration = (tripsData.reduce((sum, t) => sum + t.trip_duration, 0) / totalTrips || 0).toFixed(1);
+
+  // Most common passenger count
+  const countMap = {};
+  tripsData.forEach(t => {
+    const c = t.passenger_count;
+    countMap[c] = (countMap[c] || 0) + 1;
   });
+  const commonPassenger = Object.keys(countMap).reduce((a, b) => countMap[a] > countMap[b] ? a : b, 0);
+
+  document.getElementById("totalTrips").textContent = totalTrips;
+  document.getElementById("avgDuration").textContent = `${avgDuration} sec`;
+  document.getElementById("commonPassenger").textContent = commonPassenger;
 }
 
-// ================= FILTERING =================
-function filterData(data) {
-  const minD = Number(document.getElementById("minDistance").value);
-  const maxD = Number(document.getElementById("maxDistance").value);
-  const peak = document.getElementById("peakHours").value;
-
-  return data.filter(d => {
-    const validDist = d.trip_distance_km >= minD && d.trip_distance_km <= maxD;
-    const validSpeed = d.speed_kmph <= 60;
-
-    let validPeak = true;
-    if (peak === "8-10") validPeak = d.pickup_hour >= 8 && d.pickup_hour <= 10;
-    else if (peak === "17-19") validPeak = d.pickup_hour >= 17 && d.pickup_hour <= 19;
-
-    return validDist && validSpeed && validPeak;
-  });
-}
-
-// ================= SUMMARY =================
-function computeSummary(data) {
-  const total = data.length;
-  const avg = total>0 ? data.reduce((s,d)=>s+d.trip_duration,0)/total : 0;
-
-  const counts={};
-  data.forEach(d=>counts[d.pas]=(counts[d.pas]||0)+1);
-
-  let common="--", max=0;
-  for(const [k,v] of Object.entries(counts)) if(v>max){max=v; common=k;}
-
-  return { totalTrips: total, avgDuration: avg, commonPassenger: common };
-}
-
-// ================= CHARTS =================
+// --------------------
+// Render Charts
+// --------------------
 let tripsChart, durationChart;
 
-function renderCharts(filteredData) {
-  // Trips per date
-  const tripsPerDay = {};
-  filteredData.forEach(d=>{
-    const day=d.pickup.toISOString().split("T")[0];
-    tripsPerDay[day]=(tripsPerDay[day]||0)+1;
+function updateCharts() {
+  const tripsByHour = Array(24).fill(0);
+  const tripsMorningRush = Array(24).fill(0);
+  const tripsEveningRush = Array(24).fill(0);
+
+  tripsData.forEach(t => {
+    const h = t.pickup_hour;
+    const d = t.pickup_dayofweek;
+    tripsByHour[h]++;
+    if (d >= 1 && d <= 5) { // weekdays
+      if (h >= 8 && h <= 10) tripsMorningRush[h]++;
+      if (h >= 17 && h <= 19) tripsEveningRush[h]++;
+    }
   });
-  const dayLabels=Object.keys(tripsPerDay).sort();
-  const dayValues=dayLabels.map(d=>tripsPerDay[d]);
 
-  // Avg trip duration per hour
-  const durationPerHour={}, countPerHour={};
-  filteredData.forEach(d=>{
-    const h=d.pickup_hour;
-    durationPerHour[h]=(durationPerHour[h]||0)+d.trip_duration;
-    countPerHour[h]=(countPerHour[h]||0)+1;
+  // Trips Over Time
+  if (tripsChart) tripsChart.destroy();
+  const ctx1 = document.getElementById("tripsChart").getContext("2d");
+  tripsChart = new Chart(ctx1, {
+    type: "bar",
+    data: {
+      labels: [...Array(24).keys()].map(h => `${h}:00`),
+      datasets: [
+        { label: "Total Trips", data: tripsByHour, backgroundColor: "rgba(75,192,192,0.6)" },
+        { label: "Morning Rush (8–11 AM)", data: tripsMorningRush, backgroundColor: "rgba(255,206,86,0.6)" },
+        { label: "Evening Rush (5–8 PM)", data: tripsEveningRush, backgroundColor: "rgba(255,99,132,0.6)" }
+      ]
+    },
+    options: { responsive: true, plugins: { legend: { position: "top" } }, scales: { y: { title: { display: true, text: "Number of Trips" } } } }
   });
-  const hourLabels=[...Array(24).keys()];
-  const hourValues=hourLabels.map(h=>countPerHour[h]?durationPerHour[h]/countPerHour[h]:0);
 
-  // Update summary
-  const { totalTrips, avgDuration, commonPassenger } = computeSummary(filteredData);
-  document.getElementById("totalTrips").textContent = totalTrips;
-  document.getElementById("avgDuration").textContent = avgDuration.toFixed(0)+" sec";
-  document.getElementById("commonPassenger").textContent = commonPassenger;
+  // Avg Trip Duration by Hour
+  const durationByHour = Array(24).fill(0);
+  const countByHour = Array(24).fill(0);
+  tripsData.forEach(t => {
+    durationByHour[t.pickup_hour] += t.trip_duration;
+    countByHour[t.pickup_hour]++;
+  });
+  const avgDurationByHour = durationByHour.map((sum, i) => countByHour[i] ? (sum / countByHour[i]).toFixed(1) : 0);
 
-  // Draw charts
-  if(!tripsChart){
-    tripsChart=new Chart(document.getElementById("tripsChart"),{
-      type:"bar",
-      data:{labels:dayLabels, datasets:[{label:"Trips per Day", data:dayValues, backgroundColor:"rgba(75,192,192,0.6)"}]},
-      options:{responsive:true}
-    });
-  } else { tripsChart.data.labels=dayLabels; tripsChart.data.datasets[0].data=dayValues; tripsChart.update(); }
-
-  if(!durationChart){
-    durationChart=new Chart(document.getElementById("durationChart"),{
-      type:"line",
-      data:{labels:hourLabels, datasets:[{label:"Avg Trip Duration (sec)", data:hourValues, borderColor:"rgba(153,102,255,1)", fill:false, tension:0.2}]},
-      options:{responsive:true}
-    });
-  } else { durationChart.data.datasets[0].data=hourValues; durationChart.update(); }
+  if (durationChart) durationChart.destroy();
+  const ctx2 = document.getElementById("durationChart").getContext("2d");
+  durationChart = new Chart(ctx2, {
+    type: "line",
+    data: {
+      labels: [...Array(24).keys()].map(h => `${h}:00`),
+      datasets: [{ label: "Avg Duration (sec)", data: avgDurationByHour, borderColor: "rgba(54,162,235,1)", fill: false, tension: 0.3 }]
+    },
+    options: { responsive: true, plugins: { legend: { position: "top" } }, scales: { y: { title: { display: true, text: "Duration (sec)" } } } }
+  });
 }
 
-// ================= TOP 10 TRIPS =================
-function renderTopTrips(filteredData) {
+// --------------------
+// Populate Top Trips Table
+// --------------------
+function updateTopTrips() {
   const sortBy = document.getElementById("sortBy").value;
-  const sorted = [...filteredData].sort((a,b)=>b[sortBy]-a[sortBy]).slice(0,10);
+  const sorted = [...tripsData].sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0)).slice(0, 10);
 
   const tbody = document.getElementById("topTripsBody");
   tbody.innerHTML = "";
-  sorted.forEach(d=>{
+
+  const dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  
+  sorted.forEach(t => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${d.id}</td><td>${d.trip_distance_km.toFixed(2)}</td><td>${d.speed_kmph.toFixed(2)}</td><td>${d.trip_duration}</td><td>${d.pickup_hour}</td>`;
+    tr.innerHTML = `
+      <td>${t.trip_id}</td>
+      <td>${t.trip_distance_km.toFixed(2)}</td>
+      <td>${t.speed_kmph.toFixed(2)}</td>
+      <td>${t.trip_duration}</td>
+      <td>${t.pickup_hour}:00</td>
+      <td>${dayNames[t.pickup_dayofweek % 7]}</td>
+    `;
     tbody.appendChild(tr);
   });
 }
 
-// ================= INIT =================
-let globalData=[];
-
-async function initDashboard() {
-  globalData = await loadData();
-  const filtered = filterData(globalData);
-  renderCharts(filtered);
-  renderTopTrips(filtered);
+// --------------------
+// Update all dashboard
+// --------------------
+function updateDashboard() {
+  updateSummary();
+  updateCharts();
+  updateTopTrips();
 }
 
-// ============== Event listeners ==============
-document.getElementById("applyFilters").addEventListener("click",()=>{
-  const filtered = filterData(globalData);
-  renderCharts(filtered);
-  renderTopTrips(filtered);
+// --------------------
+// Event Listeners
+// --------------------
+document.getElementById("applyFilters").addEventListener("click", () => {
+  const minD = parseFloat(document.getElementById("minDistance").value) || 0;
+  const maxD = parseFloat(document.getElementById("maxDistance").value) || Infinity;
+  const peak = document.getElementById("peakHours").value;
+
+  tripsData = allTripsData.filter(t => {
+    const d = t.trip_distance_km;
+    const h = t.pickup_hour;
+    const day = t.pickup_dayofweek;
+    let pass = d >= minD && d <= maxD;
+
+    if (peak === "morning") pass = pass && day >= 1 && day <= 5 && h >= 8 && h <= 10;
+    if (peak === "evening") pass = pass && day >= 1 && day <= 5 && h >= 17 && h <= 19;
+
+    return pass;
+  });
+
+  updateDashboard();
 });
 
-document.getElementById("resetFilters").addEventListener("click",()=>{
-  document.getElementById("minDistance").value="2";
-  document.getElementById("maxDistance").value="10";
-  document.getElementById("peakHours").value="";
-  const filtered = filterData(globalData);
-  renderCharts(filtered);
-  renderTopTrips(filtered);
+document.getElementById("resetFilters").addEventListener("click", () => {
+  tripsData = [...allTripsData];
+  updateDashboard();
 });
 
-document.getElementById("sortBy").addEventListener("change",()=>{
-  const filtered = filterData(globalData);
-  renderTopTrips(filtered);
-});
+document.getElementById("sortBy").addEventListener("change", updateTopTrips);
 
-// Start
-initDashboard();
+// --------------------
+// Initial load
+// --------------------
+fetchTrips();
