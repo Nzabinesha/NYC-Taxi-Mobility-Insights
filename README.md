@@ -191,6 +191,7 @@ pip install -r requirements.txt
 ```
 
 ### 4️⃣ Set Up the Database
+## ⚠️ Edit the Mariadb password in the scripts before running them
 ```bash
 cd database/
 python setup_db.py
@@ -206,5 +207,6 @@ python backend/server.py
 ```bash
 http://localhost:5000
 ```
+
 
 
