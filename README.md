@@ -192,8 +192,9 @@ pip install -r requirements.txt
 
 ### 4️⃣ Set Up the Database
 ```bash
-python database/setup_db.py
-python database/insert_cleaned_taxi_data.py
+cd database/
+python setup_db.py
+python insert_cleaned_taxi_data.py
 ```
 
 ### 5️⃣ Run the Backend
@@ -205,4 +206,5 @@ python backend/server.py
 ```bash
 http://localhost:5000
 ```
+
 
