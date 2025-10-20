@@ -169,6 +169,11 @@ NYC-Taxi-Mobility-Insights/
 - **Dockerized setup** to ensure consistent development environments
 
 ---
+## 📽️ Descriptive Video
+
+Here is a short video explaining how we went about our project, app development and functionality 
+Video Link: https://youtu.be/4XoLf_5UHG0
+---
 
 ## 🧱 Setup Instructions
 
@@ -207,6 +212,7 @@ python backend/server.py
 ```bash
 http://localhost:5000
 ```
+
 
 
 
