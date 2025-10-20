@@ -171,8 +171,8 @@ NYC-Taxi-Mobility-Insights/
 ---
 ## 📽️ Descriptive Video
 
-Here is a short video explaining how we went about our project, app development and functionality 
-Video Link: https://youtu.be/4XoLf_5UHG0
+Here is a short **video** explaining how we went about our project, app development and functionality.
+**Video Link:** https://youtu.be/4XoLf_5UHG0
 ---
 
 ## 🧱 Setup Instructions
@@ -196,7 +196,7 @@ pip install -r requirements.txt
 ```
 
 ### 4️⃣ Set Up the Database
-## ⚠️ Edit the Mariadb password in the scripts before running them
+### ⚠️ Edit the Mariadb password in the scripts before running them
 ```bash
 cd database/
 python setup_db.py
@@ -212,6 +212,7 @@ python backend/server.py
 ```bash
 http://localhost:5000
 ```
+
 
 
 
