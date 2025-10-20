@@ -188,8 +188,8 @@ cd NYC-Taxi-Mobility-Insights
 ### 2️⃣ Create and Activate Virtual Environment
 ```bash
 python3 -m venv venv
-source venv/bin/activate   # (Linux/Mac)
-venv\Scripts\activate      # (Windows)
+source venv/bin/activate   # (Windows)
+venv\Scripts\activate      # (Linux/Mac)
 ```
 
 ### 3️⃣ Install Dependencies
@@ -214,6 +214,7 @@ python backend/server.py
 ```bash
 http://localhost:5000
 ```
+
 
 
 
