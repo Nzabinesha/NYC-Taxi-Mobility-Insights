@@ -7,7 +7,7 @@ import mysql.connector
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '123',  # update with your MariaDB password
+    'password': 'mypassword',  # please update user and password with your actual Msql password and user name
     'database': 'nyc_taxi_db'
 }
 
