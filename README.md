@@ -5,6 +5,7 @@
 It provides an interactive dashboard that allows users to explore patterns in taxi trips — such as trip durations, distances, and pickup times — revealing valuable insights about urban mobility in New York City.
 
 This project demonstrates a complete **data pipeline**, from cleaning and structuring large-scale data to serving it through a backend API and visualizing it on a web-based dashboard.
+Here is our code base:**https://drive.google.com/drive/folders/1EEppDkv5DV-smmu5WxEVnlluDumkfa4O?usp=sharing
 
 ---
 
@@ -215,6 +216,7 @@ python backend/server.py
 ```bash
 http://localhost:5000
 ```
+
 
 
 
