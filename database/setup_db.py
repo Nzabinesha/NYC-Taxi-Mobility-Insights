@@ -1,17 +1,12 @@
 import mysql.connector
 
-# ------------------------------
-# Database connection configuration
-# ------------------------------
 db_config = {
-    'host': 'localhost',
     'user': 'root',
-    'password': '123'  # Edit accordingly
+    'password': 'mypassword', # please remember to change the user and password with your own user name and password
+    'host': '127.0.0.1',
+    'raise_on_warnings': True
 }
 
-# ------------------------------
-# SQL statements for database and tables
-# ------------------------------
 sql_statements = [
     "CREATE DATABASE IF NOT EXISTS nyc_taxi_db",
     "USE nyc_taxi_db",
@@ -47,17 +42,17 @@ sql_statements = [
         dropoff_latitude DECIMAL(10,6),
         FOREIGN KEY (trip_id) REFERENCES trips(trip_id)
     )
-    """,
-    "CREATE INDEX IF NOT EXISTS idx_pickup_datetime ON trips(pickup_datetime)",
-    "CREATE INDEX IF NOT EXISTS idx_dropoff_datetime ON trips(dropoff_datetime)",
-    "CREATE INDEX IF NOT EXISTS idx_pickup_dayofweek ON trips(pickup_dayofweek)",
-    "CREATE INDEX IF NOT EXISTS idx_pickup_coords ON locations(pickup_longitude, pickup_latitude)",
-    "CREATE INDEX IF NOT EXISTS idx_dropoff_coords ON locations(dropoff_longitude, dropoff_latitude)"
+    """
 ]
 
-# ------------------------------
-# Execute statements
-# ------------------------------
+indexes = [
+    "CREATE INDEX idx_pickup_datetime ON trips(pickup_datetime)",
+    "CREATE INDEX idx_dropoff_datetime ON trips(dropoff_datetime)",
+    "CREATE INDEX idx_pickup_dayofweek ON trips(pickup_dayofweek)",
+    "CREATE INDEX idx_pickup_coords ON locations(pickup_longitude, pickup_latitude)",
+    "CREATE INDEX idx_dropoff_coords ON locations(dropoff_longitude, dropoff_latitude)"
+]
+
 try:
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor()
@@ -65,9 +60,16 @@ try:
     for stmt in sql_statements:
         cursor.execute(stmt)
 
+    for idx in indexes:
+        try:
+            cursor.execute(idx)
+        except mysql.connector.errors.ProgrammingError:
+            pass  # Ignore "already exists" errors
+
     print("Database 'nyc_taxi_db' and tables created successfully!")
 
 finally:
-    cursor.close()
-    connection.close()
-
+    if 'cursor' in locals():
+        cursor.close()
+    if 'connection' in locals():
+        connection.close()
